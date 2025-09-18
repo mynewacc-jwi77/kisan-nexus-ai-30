@@ -567,7 +567,7 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
 
           {/* Messages Display */}
           <div className="mb-6 border rounded-lg bg-white dark:bg-gray-900 shadow-inner">
-            <div className="h-96 overflow-y-auto p-4">
+            <div className="h-56 md:h-64 overflow-y-auto p-4">
               {(
                 <div className="space-y-4">
                   {messages.map((message) => (

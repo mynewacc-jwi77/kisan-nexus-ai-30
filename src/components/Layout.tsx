@@ -61,7 +61,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">Farmer Connect</span>
-              <span className="text-xs text-muted-foreground hidden sm:block">@</span>
+              <span className="text-xs text-muted-foreground hidden sm:block"></span>
             </div>
           </Link>
 

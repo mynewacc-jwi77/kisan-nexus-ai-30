@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDemoAuth } from "@/contexts/DemoAuthContext";
+import EnhancedFarmingAssistant from "@/components/EnhancedFarmingAssistant";
 import heroImage from "@/assets/hero-farm.jpg";
 
 export default function HeroSection() {
@@ -153,15 +154,10 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Hero Image */}
+          {/* AI Assistant */}
           <div className="relative">
-            <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-300">
-              <img 
-                src={heroImage} 
-                alt="Smart farming with AI technology" 
-                className="w-full h-auto object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            <div className="relative z-10">
+              <EnhancedFarmingAssistant />
             </div>
             
             {/* Floating elements */}
