@@ -89,7 +89,6 @@ export default function HeroSection() {
       </div>
       
       <div className="container relative z-10 px-6 py-24">
-        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="space-y-8">
@@ -163,7 +162,7 @@ export default function HeroSection() {
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-green-400/30 rounded-full animate-bounce delay-300" />
             <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-blue-400/30 rounded-full animate-bounce delay-700" />
           </div>
-
+        </div> {/* <-- Close grid-cols-2 */}
         {/* Enhanced Feature Cards */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
           <Card className="bg-white/90 backdrop-blur-sm border-green-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
@@ -202,7 +201,7 @@ export default function HeroSection() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </div> {/* <-- Close container */}
     </section>
   );
 }
