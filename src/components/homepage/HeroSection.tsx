@@ -155,20 +155,14 @@ export default function HeroSection() {
           </div>
 
           {/* AI Assistant */}
-          <div className="">
-            <div className=" z-10">
-              <EnhancedFarmingAssistant />
-          {/* AI Assistant */}
           <div className="relative">
             <div className="relative z-10">
               <EnhancedFarmingAssistant />
             </div>
-            
             {/* Floating elements */}
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-green-400/30 rounded-full animate-bounce delay-300" />
             <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-blue-400/30 rounded-full animate-bounce delay-700" />
           </div>
-        </div>
 
         {/* Enhanced Feature Cards */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
