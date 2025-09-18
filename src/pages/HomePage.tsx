@@ -21,7 +21,7 @@ export default function HomePage() {
               Get instant farming advice through chat, voice, or image analysis in your preferred language
             </p>
           </div>
-          <div className="flex justify-center">
+          <div className=" justify-center">
             <EnhancedFarmingAssistant />
           </div>
         </div>

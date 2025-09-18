@@ -155,8 +155,8 @@ export default function HeroSection() {
           </div>
 
           {/* AI Assistant */}
-          <div className="relative">
-            <div className="relative z-10">
+          <div className="">
+            <div className=" z-10">
               <EnhancedFarmingAssistant />
             </div>
             

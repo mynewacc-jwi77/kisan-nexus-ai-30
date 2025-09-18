@@ -494,7 +494,7 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 ">
         <CardHeader className="text-center border-b bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
           <CardTitle className="flex items-center justify-center gap-3 text-2xl">
             <div className="relative">

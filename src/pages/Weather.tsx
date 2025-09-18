@@ -144,7 +144,7 @@ export default function Weather() {
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="flex items-center space-x-2 py-3">
               <MapPin className="w-4 h-4 text-primary" />
-              <span className="font-medium">{location}</span>
+              <span className="font-medium">SISTech,Bhopal</span>
               <Button variant="ghost" size="sm" className="ml-2">
                 Change Location
               </Button>
