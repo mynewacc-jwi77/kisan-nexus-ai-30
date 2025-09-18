@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Mic, 
   MicOff, 
@@ -20,7 +20,10 @@ import {
   X,
   Languages,
   MessageSquare,
-  Headphones
+  Headphones,
+  Sparkles,
+  AlertTriangle,
+  Leaf
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { geminiAI } from '@/lib/gemini';
@@ -49,7 +52,20 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
   const [recognition, setRecognition] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [apiError, setApiError] = useState(false);
+
+  // Initialize with welcome message
+  useEffect(() => {
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      type: 'assistant',
+      content: getLocalizedResponse('welcome'),
+      timestamp: new Date()
+    };
+    if (messages.length === 0) {
+      setMessages([welcomeMessage]);
+    }
+  }, [selectedLanguage]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -205,38 +221,41 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
 
   const processQuery = async (query: string, type: 'text' | 'voice'): Promise<string> => {
     try {
+      setApiError(false);
       const advice = await geminiAI.getFarmingAdvice(query, selectedLanguage);
       return advice.response;
     } catch (error) {
       console.error('Gemini API error:', error);
+      setApiError(true);
       
-      // Show error toast but continue with fallback
-      toast({
-        title: "API Quota Exceeded",
-        description: "Using offline farming knowledge base",
-        variant: "default"
-      });
+      // Show helpful error info
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('429') || errorMessage.includes('quota')) {
+        toast({
+          title: "AI Service Temporarily Unavailable",
+          description: "Using our offline farming knowledge base instead",
+          variant: "default"
+        });
+      }
       
-      // Fallback responses based on language
       return getFallbackResponse(query);
     }
   };
 
   const processImageQuery = async (query: string, image: File): Promise<string> => {
     try {
-      // Try to use Gemini AI for image analysis
+      setApiError(false);
       const reader = new FileReader();
       return new Promise((resolve, reject) => {
         reader.onload = async (e) => {
           try {
             const base64 = e.target?.result as string;
             const aiResult = await geminiAI.analyzeCropImage(base64);
-            
-            // Format response based on language
             const response = formatImageAnalysisResponse(aiResult, query);
             resolve(response);
           } catch (error) {
             console.error('AI image analysis error:', error);
+            setApiError(true);
             reject(error);
           }
         };
@@ -244,25 +263,15 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
       });
     } catch (error) {
       console.error('Image processing error:', error);
+      setApiError(true);
       
       toast({
-        title: "Image Analysis Unavailable",
-        description: "Using visual assessment guide",
+        title: "AI Image Analysis Unavailable",
+        description: "Using our visual assessment guide instead",
         variant: "default"
       });
       
-      // Fallback to contextual responses based on query
-      const queryLower = query.toLowerCase();
-      
-      if (queryLower.includes('disease') || queryLower.includes('pest') || queryLower.includes('problem') || queryLower.includes('बीमारी')) {
-        return getLocalizedResponse('disease_analysis');
-      } else if (queryLower.includes('growth') || queryLower.includes('health') || queryLower.includes('condition') || queryLower.includes('वृद्धि')) {
-        return getLocalizedResponse('crop_health');
-      } else if (queryLower.includes('harvest') || queryLower.includes('ready') || queryLower.includes('mature') || queryLower.includes('कटाई')) {
-        return getLocalizedResponse('harvest_timing');
-      } else {
-        return getLocalizedResponse('general_image');
-      }
+      return getLocalizedResponse('disease_analysis');
     }
   };
 
@@ -378,12 +387,47 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
         malayalam: 'ചിത്രം നല്ല നിലവാരത്തിലാണ്. വിശദമായ ഉപദേശത്തിനായി ദയവായി നിങ്ങളുടെ ചോദ്യം കൂടുതൽ വ്യക്തമാക്കുക.',
         punjabi: 'ਤਸਵੀਰ ਚੰਗੀ ਕੁਆਲਿਟੀ ਦੀ ਹੈ। ਵਿਸਤ੍ਰਿਤ ਸਲਾਹ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਸਵਾਲ ਹੋਰ ਸਪੱਸ਼ਟ ਕਰੋ।'
       },
+      welcome: {
+        hindi: '🌾 नमस्कार! मैं आपका AI कृषि सहायक हूँ। मैं फसल, मौसम, बीमारियों और खेती की तकनीकों के बारे में आपकी मदद कर सकता हूँ। आप मुझसे सवाल पूछ सकते हैं, आवाज़ में बात कर सकते हैं, या फसल की तस्वीर भेज सकते हैं।',
+        english: '🌾 Hello! I am your AI farming assistant. I can help you with crops, weather, diseases, and farming techniques. You can ask me questions, talk to me using voice, or send crop images for analysis.',
+        marathi: '🌾 नमस्कार! मी तुमचा AI शेती सहायक आहे. मी पिके, हवामान, रोग आणि शेती तंत्रज्ञानाबद्दल तुमची मदत करू शकतो. तुम्ही मला प्रश्न विचारू शकता, आवाजातून बोलू शकता किंवा पिकांचे फोटो पाठवू शकता.',
+        malayalam: '🌾 നമസ്കാരം! ഞാൻ നിങ്ങളുടെ AI കൃഷി സഹായകനാണ്. വിളകൾ, കാലാവസ്ഥ, രോഗങ്ങൾ, കൃഷി സാങ്കേതികവിദ്യകൾ എന്നിവയിൽ ഞാൻ നിങ്ങളെ സഹായിക്കാം. നിങ്ങൾക്ക് ചോദ്യങ്ങൾ ചോദിക്കാം, വോയ്സ് ഉപയോഗിച്ച് സംസാരിക്കാം, അല്ലെങ്കിൽ വിള ചിത്രങ്ങൾ അയയ്ക്കാം.',
+        punjabi: '🌾 ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ AI ਖੇਤੀ ਸਹਾਇਕ ਹਾਂ। ਮੈਂ ਫਸਲਾਂ, ਮੌਸਮ, ਬਿਮਾਰੀਆਂ ਅਤੇ ਖੇਤੀ ਤਕਨੀਕਾਂ ਬਾਰੇ ਤੁਹਾਡੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ਮੈਨੂੰ ਸਵਾਲ ਪੁੱਛ ਸਕਦੇ ਹੋ, ਆਵਾਜ਼ ਵਿੱਚ ਗੱਲ ਕਰ ਸਕਦੇ ਹੋ, ਜਾਂ ਫਸਲ ਦੀਆਂ ਤਸਵੀਰਾਂ ਭੇਜ ਸਕਦੇ ਹੋ।'
+      },
       default: {
         hindi: 'नमस्कार! मैं आपकी खेती से जुड़े सवालों का जवाब देने के लिए यहाँ हूँ। कृपया अपना प्रश्न पूछें या कोई तस्वीर साझा करें।',
         english: 'Hello! I am here to answer your farming-related questions. Please ask your question or share an image.',
         marathi: 'नमस्कार! मी तुमच्या शेतीशी संबंधित प्रश्नांची उत्तरे देण्यासाठी येथे आहे. कृपया तुमचा प्रश्न विचारा किंवा चित्र सामायिक करा.',
         malayalam: 'നമസ്കാരം! കൃഷിയുമായി ബന്ധപ്പെട്ട നിങ്ങളുടെ ചോദ്യങ്ങൾക്ക് ഉത്തരം നൽകാൻ ഞാൻ ഇവിടെയുണ്ട്. ദയവായി നിങ്ങളുടെ ചോദ്യം ചോദിക്കുകയോ ഒരു ചിത്രം പങ്കിടുകയോ ചെയ്യുക.',
         punjabi: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡੇ ਖੇਤੀ ਨਾਲ ਜੁੜੇ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਦੇਣ ਲਈ ਇੱਥੇ ਹਾਂ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਸਵਾਲ ਪੁੱਛੋ ਜਾਂ ਤਸਵੀਰ ਸਾਂਝੀ ਕਰੋ।'
+      },
+      sample_weather: {
+        hindi: 'इस मौसम में कौन सी फसल लगानी चाहिए?',
+        english: 'Which crops should I plant this season?',
+        marathi: 'या हंगामात कोणते पीक लावावे?',
+        malayalam: 'ഈ സീസണിൽ ഏത് വിളകൾ നടണം?',
+        punjabi: 'ਇਸ ਮੌਸਮ ਵਿੱਚ ਕਿਹੜੀ ਫਸਲ ਲਗਾਉਣੀ ਚਾਹੀਦੀ ਹੈ?'
+      },
+      sample_crop: {
+        hindi: 'गेहूं की फसल में पैदावार कैसे बढ़ाएं?',
+        english: 'How to increase wheat crop yield?',
+        marathi: 'गहूच्या पिकात उत्पादन कसे वाढवावे?',
+        malayalam: 'ഗോതമ്പ് വിളവ് എങ്ങനെ വർദ്ധിപ്പിക്കാം?',
+        punjabi: 'ਕਣਕ ਦੀ ਫਸਲ ਵਿੱਚ ਪੈਦਾਵਾਰ ਕਿਵੇਂ ਵਧਾਈਏ?'
+      },
+      sample_disease: {
+        hindi: 'टमाटर के पत्तों पर धब्बे हैं, क्या करूं?',
+        english: 'Tomato leaves have spots, what should I do?',
+        marathi: 'टोमॅटोच्या पानांवर डाग आहेत, काय करावे?',
+        malayalam: 'തക്കാളി ഇലകളിൽ പാടുകൾ ഉണ്ട്, എന്ത് ചെയ്യണം?',
+        punjabi: 'ਟਮਾਟਰ ਦੇ ਪੱਤਿਆਂ ਤੇ ਧੱਬੇ ਹਨ, ਕੀ ਕਰਾਂ?'
+      },
+      sample_fertilizer: {
+        hindi: 'मक्का के लिए कौन सी खाद बेहतर है?',
+        english: 'Which fertilizer is better for corn?',
+        marathi: 'मक्याच्या पिकासाठी कोणते खत चांगले आहे?',
+        malayalam: 'ചോളത്തിന് ഏത് വളം നല്ലത്?',
+        punjabi: 'ਮੱਕੀ ਲਈ ਕਿਹੜੀ ਖਾਦ ਬਿਹਤਰ ਹੈ?'
       }
     };
 
@@ -449,64 +493,60 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-          <CardContent className="p-6 text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Brain className="w-8 h-8 text-primary mr-2" />
-              <h3 className="text-xl font-semibold">AI Farming Assistant</h3>
+    <div className="w-full max-w-4xl mx-auto">
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+        <CardHeader className="text-center border-b bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+          <CardTitle className="flex items-center justify-center gap-3 text-2xl">
+            <div className="relative">
+              <Brain className="w-8 h-8 text-primary" />
+              <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1" />
             </div>
-            <p className="text-muted-foreground mb-4">
-              Get instant farming advice through chat, voice, or image analysis
-            </p>
-            <div className="flex justify-center gap-2">
-              <Badge variant="outline"><MessageSquare className="w-3 h-3 mr-1" />Chat</Badge>
-              <Badge variant="outline"><Headphones className="w-3 h-3 mr-1" />Voice</Badge>
-              <Badge variant="outline"><Camera className="w-3 h-3 mr-1" />Image</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </DialogTrigger>
-      
-      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
-            Enhanced Farming Assistant
+            AI Farming Assistant
             <Badge variant="secondary" className="ml-2">
               <Languages className="w-3 h-3 mr-1" />
               {languages.find(l => l.code === selectedLanguage)?.nativeName}
             </Badge>
-          </DialogTitle>
-        </DialogHeader>
+          </CardTitle>
+          
+          {apiError && (
+            <Alert className="mt-4 border-orange-200 bg-orange-50">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                AI service temporarily unavailable. Using offline knowledge base.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardHeader>
 
-        <div className="flex-1 flex flex-col min-h-0">
+        <CardContent className="p-6">
           {/* Mode and Language Selection */}
-          <div className="flex gap-4 mb-4 p-4 bg-muted/30 rounded-lg">
-            <div className="flex gap-2">
+          <div className="flex flex-wrap gap-4 mb-6 p-4 bg-white/70 dark:bg-gray-800/50 rounded-lg border">
+            <div className="flex gap-2 flex-wrap">
               <Button
                 variant={mode === 'chat' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setMode('chat')}
+                className="transition-all"
               >
-                <MessageCircle className="w-4 h-4 mr-1" />
+                <MessageCircle className="w-4 h-4 mr-2" />
                 Chat
               </Button>
               <Button
                 variant={mode === 'voice' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setMode('voice')}
+                className="transition-all"
               >
-                <Mic className="w-4 h-4 mr-1" />
+                <Mic className="w-4 h-4 mr-2" />
                 Voice
               </Button>
               <Button
                 variant={mode === 'image' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setMode('image')}
+                className="transition-all"
               >
-                <Camera className="w-4 h-4 mr-1" />
+                <Camera className="w-4 h-4 mr-2" />
                 Image
               </Button>
             </div>
@@ -526,68 +566,85 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
           </div>
 
           {/* Messages Display */}
-          <div className="flex-1 overflow-y-auto border rounded-lg p-4 mb-4 bg-background min-h-[300px]">
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <div className="text-center">
-                  <Brain className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Start a conversation with the AI farming assistant</p>
-                  <p className="text-sm mt-1">Ask questions about crops, weather, diseases, or upload images</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-3 rounded-lg ${
-                      message.type === 'user' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted'
-                    }`}>
-                      {message.image && (
-                        <img 
-                          src={message.image} 
-                          alt="User uploaded" 
-                          className="w-32 h-32 object-cover rounded mb-2"
-                        />
-                      )}
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                      {message.audio && (
-                        <Badge variant="secondary" className="mt-1">
-                          <Headphones className="w-3 h-3 mr-1" />
-                          Voice Message
-                        </Badge>
-                      )}
-                      <p className="text-xs opacity-70 mt-1">
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {isProcessing && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted p-3 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>AI is thinking...</span>
+          <div className="mb-6 border rounded-lg bg-white dark:bg-gray-900 shadow-inner">
+            <div className="h-96 overflow-y-auto p-4">
+              {(
+                <div className="space-y-4">
+                  {messages.map((message) => (
+                    <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] p-4 rounded-lg shadow-sm transition-all ${
+                        message.type === 'user' 
+                          ? 'bg-primary text-primary-foreground ml-4' 
+                          : 'bg-gradient-to-br from-muted to-muted/70 mr-4 border border-border/50'
+                      }`}>
+                        {message.image && (
+                          <img 
+                            src={message.image} 
+                            alt="User uploaded" 
+                            className="w-40 h-40 object-cover rounded-lg mb-3 shadow-sm"
+                          />
+                        )}
+                        <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                        {message.audio && (
+                          <Badge variant="secondary" className="mt-2">
+                            <Headphones className="w-3 h-3 mr-1" />
+                            Voice Message
+                          </Badge>
+                        )}
+                        <p className="text-xs opacity-70 mt-2">
+                          {message.timestamp.toLocaleTimeString()}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
+                  ))}
+                  {isProcessing && (
+                    <div className="flex justify-start">
+                      <div className="bg-gradient-to-br from-muted to-muted/70 border p-4 rounded-lg mr-4 shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                          <span className="text-sm">🤖 AI is analyzing your question...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Input Area */}
+          {/* Sample Questions */}
+          {messages.length <= 1 && mode === 'chat' && (
+            <div className="mb-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <p className="text-sm font-medium mb-3 text-primary">💡 Try asking me about:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {[
+                  getLocalizedResponse('sample_weather'),
+                  getLocalizedResponse('sample_crop'),
+                  getLocalizedResponse('sample_disease'),
+                  getLocalizedResponse('sample_fertilizer')
+                ].map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setInputText(suggestion)}
+                    className="text-left p-2 text-sm bg-white dark:bg-gray-800 rounded border hover:bg-primary/5 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input Section */}
           <div className="border-t pt-4">
             {mode === 'chat' && (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Ask about crops, weather, diseases, or farming techniques..."
-                  className="flex-1 min-h-[60px]"
+                  placeholder="Ask about crops, weather, diseases, fertilizers, or any farming question..."
+                  className="flex-1 min-h-[80px] resize-none"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -598,52 +655,65 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
                 <Button 
                   onClick={handleTextQuery} 
                   disabled={!inputText.trim() || isProcessing}
-                  className="self-end"
+                  className="self-end h-12 px-6"
+                  size="lg"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </Button>
               </div>
             )}
 
             {mode === 'voice' && (
-              <div className="flex flex-col gap-4">
+              <div className="text-center space-y-6">
                 <div className="flex justify-center gap-4">
                   {!isListening ? (
-                    <Button onClick={startListening} size="lg" className="bg-green-600 hover:bg-green-700">
-                      <Mic className="w-5 h-5 mr-2" />
-                      Start Recording
+                    <Button 
+                      onClick={startListening} 
+                      size="lg" 
+                      className="bg-green-600 hover:bg-green-700 px-8 py-6 text-lg"
+                    >
+                      <Mic className="w-6 h-6 mr-3" />
+                      Start Voice Recording
                     </Button>
                   ) : (
-                    <Button onClick={stopListening} size="lg" variant="destructive">
-                      <MicOff className="w-5 h-5 mr-2" />
+                    <Button 
+                      onClick={stopListening} 
+                      size="lg" 
+                      variant="destructive"
+                      className="px-8 py-6 text-lg"
+                    >
+                      <MicOff className="w-6 h-6 mr-3" />
                       Stop Recording
                     </Button>
                   )}
                   
-                  {isSpeaking ? (
-                    <Button onClick={stopSpeaking} size="lg" variant="outline">
-                      <VolumeX className="w-5 h-5 mr-2" />
+                  {isSpeaking && (
+                    <Button 
+                      onClick={stopSpeaking} 
+                      size="lg" 
+                      variant="outline"
+                      className="px-8 py-6 text-lg"
+                    >
+                      <VolumeX className="w-6 h-6 mr-3" />
                       Stop Speaking
-                    </Button>
-                  ) : (
-                    <Button disabled size="lg" variant="outline">
-                      <Volume2 className="w-5 h-5 mr-2" />
-                      Text-to-Speech Ready
                     </Button>
                   )}
                 </div>
+                
                 {isListening && (
-                  <div className="text-center text-muted-foreground">
-                    <div className="animate-pulse">🎤 Listening... Speak now</div>
+                  <div className="p-6 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-center gap-3 text-green-700 dark:text-green-300">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-lg font-medium">🎤 Listening... Please speak clearly</span>
+                    </div>
                   </div>
                 )}
               </div>
             )}
 
             {mode === 'image' && (
-              <div className="space-y-4">
-                {/* Image Upload Area */}
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <div className="space-y-6">
+                <div className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center bg-primary/5">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -657,9 +727,9 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
                       <img 
                         src={selectedImage} 
                         alt="Selected crop" 
-                        className="max-h-48 mx-auto rounded-lg shadow-md"
+                        className="max-h-64 mx-auto rounded-lg shadow-lg border"
                       />
-                      <div className="flex justify-center gap-2">
+                      <div className="flex justify-center gap-3">
                         <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
                           <Upload className="w-4 h-4 mr-2" />
                           Change Image
@@ -672,44 +742,49 @@ export default function EnhancedFarmingAssistant({ onQuery }: EnhancedFarmingAss
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Camera className="w-8 h-8 text-primary" />
+                      <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Camera className="w-10 h-10 text-primary" />
                       </div>
                       <div>
-                        <p className="text-lg font-medium">Upload Crop Image</p>
-                        <p className="text-sm text-muted-foreground">
-                          Click to select an image for analysis
+                        <p className="text-xl font-medium">Upload Crop Image</p>
+                        <p className="text-muted-foreground mt-2">
+                          Upload a photo of your crops, leaves, or plants for AI analysis
                         </p>
                       </div>
-                      <Button onClick={() => fileInputRef.current?.click()}>
-                        <Upload className="w-4 h-4 mr-2" />
+                      <Button 
+                        onClick={() => fileInputRef.current?.click()}
+                        size="lg"
+                        className="px-8"
+                      >
+                        <Upload className="w-5 h-5 mr-3" />
                         Choose Image
                       </Button>
                     </div>
                   )}
                 </div>
 
-                {/* Question Input */}
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Input
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder="What would you like to know about this image?"
-                    className="flex-1"
+                    placeholder="What would you like to know about this image? (e.g., diseases, health, growth stage)"
+                    className="flex-1 h-12"
                   />
                   <Button 
                     onClick={handleImageQuery} 
                     disabled={!selectedImage || !inputText.trim() || isProcessing}
+                    size="lg"
+                    className="px-6"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
