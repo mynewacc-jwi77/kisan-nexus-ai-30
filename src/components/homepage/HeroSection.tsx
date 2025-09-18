@@ -158,6 +158,10 @@ export default function HeroSection() {
           <div className="">
             <div className=" z-10">
               <EnhancedFarmingAssistant />
+          {/* AI Assistant */}
+          <div className="relative">
+            <div className="relative z-10">
+              <EnhancedFarmingAssistant />
             </div>
             
             {/* Floating elements */}
