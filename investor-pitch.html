@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Connect - Investor Pitch</title>
+    <style>
+        :root {
+            --primary: #2E7D32;
+            --secondary: #FFC107;
+            --text: #333333;
+            --background: #FFFFFF;
+            --slide-bg: #F9F9F9;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            background-color: var(--background);
+        }
+        
+        .presentation-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .slide {
+            background-color: var(--slide-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 40px;
+            page-break-after: always;
+        }
+        
+        .slide-title {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+        
+        .slide-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .two-column {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .column {
+            flex: 1;
+        }
+        
+        .team-member {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .team-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .feature-box {
+            background-color: white;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .metrics-box {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .metrics-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .metrics-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .timeline {
+            display: flex;
+            margin-top: 20px;
+            position: relative;
+            justify-content: space-between;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--secondary);
+            z-index: 1;
+        }
+        
+        .timeline-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 120px;
+        }
+        
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+        }
+        
+        .timeline-date {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-text {
+            font-size: 12px;
+        }
+        
+        .financial-chart {
+            height: 200px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        
+        .chart-bar {
+            width: 60px;
+            background-color: var(--primary);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .image-placeholder {
+            background-color: #e0e0e0;
+            height: 200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-style: italic;
+        }
+        
+        .print-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        @media print {
+            .slide {
+                page-break-after: always;
+                box-shadow: none;
+            }
+            
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide">
+            <div class="slide-content" style="text-align: center;">
+                <h1 style="font-size: 42px; color: var(--primary); margin-bottom: 10px;">Farmer Connect</h1>
+                <p style="font-size: 24px; margin-bottom: 40px;">Empowering Farmers with AI-Driven Agricultural Technology</p>
+                
+                <div style="margin: 40px 0;">
+                    <div class="team-member" style="justify-content: center;">
+                        <div class="team-avatar">TC</div>
+                        <div>
+                            <div><strong>Team Kisan Nexus</strong></div>
+                            <div>Smart India Hackathon 2023</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 60px;">
+                    <p><strong>Contact:</strong> team@farmerconnect.in | +91 98765 43210</p>
+                    <p><strong>Date:</strong> July 2023</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Introduction -->
+        <div class="slide">
+            <h2 class="slide-title">Introduction</h2>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Project Overview</h3>
+                        <p>Farmer Connect is a comprehensive agricultural technology platform that bridges the digital divide for Indian farmers. Our platform leverages AI, voice technology, and real-time data to transform traditional farming into precision agriculture.</p>
+                        
+                        <h3>Mission Statement</h3>
+                        <p>"To empower every Indian farmer with accessible technology that increases productivity, sustainability, and income while reducing risks."</p>
+                    </div>
+                    <div class="column">
+                        <h3>Value Proposition</h3>
+                        <ul>
+                            <li>AI-powered crop disease detection and treatment recommendations</li>
+                            <li>Voice-enabled interface for farmers with limited digital literacy</li>
+                            <li>Smart weather insights with agricultural recommendations</li>
+                            <li>Machinery rental marketplace reducing capital expenditure</li>
+                            <li>Simplified access to government schemes and subsidies</li>
+                        </ul>
+                        
+                        <h3>Target Audience</h3>
+                        <p>Our primary users are the 118 million small and marginal farmers across India who have limited access to agricultural technology, expertise, and resources.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Visual Demonstration -->
+        <div class="slide">
+            <h2 class="slide-title">Visual Demonstration</h2>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="image-placeholder">
+                            Disease Detection Interface
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>AI-Powered Disease Detection</strong></p>
+                        
+                        <div class="image-placeholder" style="margin-top: 20px;">
+                            Voice Interface Demo
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>Voice-Enabled Assistance</strong></p>
+                    </div>
+                    <div class="column">
+                        <div class="image-placeholder">
+                            Weather Dashboard
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>Smart Weather Insights</strong></p>
+                        
+                        <div class="image-placeholder" style="margin-top: 20px;">
+                            Machinery Marketplace
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>Equipment Rental Platform</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Problem & Solution -->
+        <div class="slide">
+            <h2 class="slide-title">Problem & Solution</h2>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Problem Statement</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">Limited Access to Agricultural Expertise</div>
+                            <p>Only 1 agricultural extension worker is available for every 5,000 farmers in India, leaving many without access to critical knowledge.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Crop Disease Losses</div>
+                            <p>Indian farmers lose approximately 35% of crop yield annually due to pests and diseases, representing ₹50,000 crores in economic loss.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Equipment Affordability</div>
+                            <p>87% of Indian farmers are small and marginal landholders who cannot afford modern agricultural machinery, limiting productivity.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Digital Literacy Barriers</div>
+                            <p>Despite 45% smartphone penetration in rural India, complex interfaces limit technology adoption among farmers.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>Our Solution</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">AI-Powered Disease Detection</div>
+                            <p>Instant identification of crop diseases through image upload with treatment recommendations, reducing crop losses by up to 25%.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Voice-First Interface</div>
+                            <p>Natural language voice commands in regional languages, making technology accessible to farmers with limited digital literacy.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Machinery Marketplace</div>
+                            <p>Peer-to-peer equipment rental platform reducing capital expenditure by 60% while increasing mechanization.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Simplified Government Schemes</div>
+                            <p>AI-assisted navigation of complex agricultural subsidies and schemes, increasing access to financial support by 40%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Technology & Innovation -->
+        <div class="slide">
+            <h2 class="slide-title">Technology & Innovation</h2>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Technical Specifications</h3>
+                        <ul>
+                            <li><strong>Frontend:</strong> React 18, TypeScript, Vite</li>
+                            <li><strong>Styling:</strong> Tailwind CSS, shadcn/ui components</li>
+                            <li><strong>Routing:</strong> React Router DOM</li>
+                            <li><strong>State Management:</strong> React Context API</li>
+                            <li><strong>AI Integration:</strong> Google Gemini API</li>
+                            <li><strong>Voice Interface:</strong> Web Speech API</li>
+                            <li><strong>Weather Data:</strong> OpenWeatherMap API</li>
+                            <li><strong>Database:</strong> Supabase</li>
+                            <li><strong>Deployment:</strong> Vercel</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Unique Features</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">Multimodal AI Analysis</div>
+                            <p>Our platform combines image, text, and voice data to provide comprehensive agricultural insights using Google's Gemini API.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Progressive Web App</div>
+                            <p>Offline-first architecture allows farmers to access critical features even in areas with limited connectivity.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Localized Voice Interface</div>
+                            <p>Natural language processing in multiple Indian languages makes the platform accessible to farmers across different regions.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Adaptive Weather Insights</div>
+                            <p>AI-driven agricultural recommendations based on hyperlocal weather patterns and crop-specific requirements.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Business Model -->
+        <div class="slide">
+            <h2 class="slide-title">Business Model</h2>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Market Size & Opportunity</h3>
+                        <div class="metrics-box">
+                            <div class="metrics-value">118M</div>
+                            <div class="metrics-label">Small & Marginal Farmers in India</div>
+                        </div>
+                        
+                        <div class="metrics-box">
+                            <div class="metrics-value">$370B</div>
+                            <div class="metrics-label">Indian Agricultural Market Size</div>
+                        </div>
+                        
+                        <div class="metrics-box">
+                            <div class="metrics-value">45%</div>
+                            <div class="metrics-label">Rural Smartphone Penetration</div>
+                        </div>
+                        
+                        <h3>Target Segments</h3>
+                        <ul>
+                            <li><strong>Primary:</strong> Small and marginal farmers (0.5-2 hectares)</li>
+                            <li><strong>Secondary:</strong> Medium-scale farmers (2-10 hectares)</li>
+                            <li><strong>Tertiary:</strong> Agricultural input suppliers and equipment owners</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Revenue Streams</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">Freemium Model</div>
+                            <p>Basic features free for all farmers; premium features available through subscription (₹99-299/month).</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Transaction Fees</div>
+                            <p>5-10% commission on machinery rentals and agricultural product sales through the marketplace.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">B2B Partnerships</div>
+                            <p>Revenue sharing with agricultural input suppliers, financial institutions, and equipment manufacturers.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Data Insights</div>
+                            <p>Anonymized agricultural data insights for agribusinesses, research institutions, and government agencies.</p>
+                        </div>
+                        
+                        <h3>Competitive Landscape</h3>
+                        <p>While competitors like DeHaat, AgroStar, and Gramophone offer partial solutions, Farmer Connect is the only platform providing a comprehensive suite of AI-powered tools with voice-first accessibility.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Implementation Plan -->
+        <div class="slide">
+            <h2 class="slide-title">Implementation Plan</h2>
+            <div class="slide-content">
+                <h3>Development Roadmap</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Q3 2023</div>
+                        <div class="timeline-text">MVP Launch Disease Detection & Weather</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Q4 2023</div>
+                        <div class="timeline-text">Voice Interface & Marketplace Beta</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Q1 2024</div>
+                        <div class="timeline-text">Full Platform Launch & Regional Expansion</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Q3 2024</div>
+                        <div class="timeline-text">Premium Features & B2B Partnerships</div>
+                    </div>
+                </div>
+                
+                <div class="two-column" style="margin-top: 40px;">
+                    <div class="column">
+                        <h3>Resource Requirements</h3>
+                        <ul>
+                            <li><strong>Technical Team:</strong> 5 developers, 2 AI specialists, 1 UX designer</li>
+                            <li><strong>Field Operations:</strong> 10 agricultural extension workers for initial pilot</li>
+                            <li><strong>Infrastructure:</strong> Cloud hosting, AI model training, API integrations</li>
+                            <li><strong>Marketing:</strong> Rural outreach programs, digital marketing, partnerships</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Risk Assessment</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">Connectivity Challenges</div>
+                            <p><strong>Mitigation:</strong> Offline-first architecture with data synchronization when connectivity is available.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Adoption Barriers</div>
+                            <p><strong>Mitigation:</strong> Voice-first interface and partnership with local agricultural extension workers for training.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">AI Accuracy</div>
+                            <p><strong>Mitigation:</strong> Continuous model improvement with feedback loops and expert validation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Financials -->
+        <div class="slide">
+            <h2 class="slide-title">Financials</h2>
+            <div class="slide-content">
+                <h3>5-Year Projections (in ₹ Crores)</h3>
+                <div class="financial-chart">
+                    <div class="chart-bar" style="height: 20%;">
+                        <div class="chart-value">0.5</div>
+                        <div class="chart-label">Year 1</div>
+                    </div>
+                    <div class="chart-bar" style="height: 40%;">
+                        <div class="chart-value">2.5</div>
+                        <div class="chart-label">Year 2</div>
+                    </div>
+                    <div class="chart-bar" style="height: 60%;">
+                        <div class="chart-value">8</div>
+                        <div class="chart-label">Year 3</div>
+                    </div>
+                    <div class="chart-bar" style="height: 80%;">
+                        <div class="chart-value">20</div>
+                        <div class="chart-label">Year 4</div>
+                    </div>
+                    <div class="chart-bar" style="height: 100%;">
+                        <div class="chart-value">45</div>
+                        <div class="chart-label">Year 5</div>
+                    </div>
+                </div>
+                
+                <div class="two-column" style="margin-top: 40px;">
+                    <div class="column">
+                        <h3>Key Financial Metrics</h3>
+                        <ul>
+                            <li><strong>User Acquisition Cost:</strong> ₹120 per farmer</li>
+                            <li><strong>Average Revenue Per User:</strong> ₹450/year (Year 1) to ₹1,200/year (Year 5)</li>
+                            <li><strong>Gross Margin:</strong> 65% (Year 1) to 75% (Year 5)</li>
+                            <li><strong>Break-Even Point:</strong> Q4 2025 (Month 30)</li>
+                            <li><strong>Projected Valuation (Year 5):</strong> ₹350 Crores</li>
+                        </ul>
+                        
+                        <h3>Funding Requirements</h3>
+                        <p>We are seeking ₹5 Crores in seed funding to support our 18-month roadmap to full platform launch and initial market penetration.</p>
+                    </div>
+                    <div class="column">
+                        <h3>Use of Funds</h3>
+                        <div class="feature-box">
+                            <div class="feature-title">Product Development (40%)</div>
+                            <p>Engineering team expansion, AI model training, feature development, and platform optimization.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Market Expansion (30%)</div>
+                            <p>Rural outreach programs, farmer onboarding, and regional language support.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Operations (20%)</div>
+                            <p>Infrastructure, customer support, and agricultural expertise network.</p>
+                        </div>
+                        
+                        <div class="feature-box">
+                            <div class="feature-title">Working Capital (10%)</div>
+                            <p>Operational expenses and contingency fund for 18 months.</p>
+                        </div>
+                        
+                        <h3>ROI Potential</h3>
+                        <p>Investors can expect a 7-10x return on investment within 5 years, with potential exit opportunities through strategic acquisition or Series B/C funding rounds.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="print-button" onclick="window.print()">Print Presentation</button>
+    
+    <script>
+        // Add any interactive elements or charts here if needed
+    </script>
+</body>
+</html>

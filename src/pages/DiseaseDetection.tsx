@@ -242,10 +242,10 @@ export default function DiseaseDetection() {
           </Badge>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Crop Disease Detection
-            <span className="block text-primary flex items-center justify-center">
+            {/* <span className="block text-primary flex items-center justify-center">
               <Sparkles className="w-5 h-5 mr-2" />
               Powered by Gemini AI
-            </span>
+            </span> */}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Upload a photo of your crop to get instant AI-powered disease identification 
@@ -373,7 +373,7 @@ export default function DiseaseDetection() {
                           {useAI ? (
                             <>
                               <Brain className="w-4 h-4 mr-2" />
-                              Start Gemini AI Analysis
+                              Start Analysis
                             </>
                           ) : (
                             <>
